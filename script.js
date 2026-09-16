@@ -1079,10 +1079,4 @@ document.addEventListener("DOMContentLoaded", () => {
   renderResults();
 
 });
-Danach
-Ganz unten auf Commit changes drücken.
-Dann sind alle drei Hauptdateien drin:
-✅ index.html
-✅ style.css
-✅ script.js
-Danach warten wir kurz, laden deine GitHub-Pages-Seite neu und testen erstmal, ob alles sauber läuft, bevor wir noch mehr Daten hineinpacken.
+
