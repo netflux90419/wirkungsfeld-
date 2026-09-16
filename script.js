@@ -668,4 +668,421 @@ function renderDossiers(){
 
           <div class="dossier-index">
             AKTE ${String(index + 1).padStart(2,"0")}
-       
+          </div>
+
+          <div>
+
+            <h3>
+              ${item.title}
+            </h3>
+
+            <p>
+              ${item.summary}
+            </p>
+
+            <div class="dossier-tags">
+
+              <span class="tag">
+                ${statusLabel(item.status)}
+              </span>
+
+              <span class="tag">
+                ${item.type}
+              </span>
+
+              <span class="tag">
+                ${item.date}
+              </span>
+
+            </div>
+
+          </div>
+
+        </article>
+      `;
+
+    }).join("");
+
+}
+
+
+function renderTimeline(){
+
+  const timeline =
+    document.querySelector("#timeline");
+
+  if(!timeline) return;
+
+  timeline.innerHTML =
+    TIMELINE.map(item => {
+
+      return `
+        <article class="time-item">
+
+          <span class="time-date">
+            ${item[0]}
+          </span>
+
+          <h3>
+            ${item[1]}
+          </h3>
+
+          <p>
+            ${item[2]}
+          </p>
+
+        </article>
+      `;
+
+    }).join("");
+
+}
+
+
+function renderSources(){
+
+  const sourceList =
+    document.querySelector("#sourceList");
+
+  if(!sourceList) return;
+
+  sourceList.innerHTML =
+    SOURCES.map(source => {
+
+      return `
+        <article class="source">
+
+          <span class="source-type">
+            ${source.type}
+          </span>
+
+          <div>
+
+            <h3>
+              ${source.title}
+            </h3>
+
+            <p>
+              ${source.desc}
+            </p>
+
+          </div>
+
+          <span class="source-year">
+            ${source.year}
+          </span>
+
+          <a
+            href="${source.url}"
+            target="_blank"
+            rel="noopener"
+            aria-label="Quelle öffnen">
+
+            ↗
+
+          </a>
+
+        </article>
+      `;
+
+    }).join("");
+
+}
+
+
+function openDetail(id){
+
+  const item =
+    DATA.find(x => x.id === id);
+
+  if(!item) return;
+
+  const field =
+    FIELDS.find(x => x.id === item.field);
+
+
+  const dialog =
+    document.querySelector("#detailDialog");
+
+  const content =
+    document.querySelector("#dialogContent");
+
+
+  content.innerHTML = `
+
+    <div class="detail-body">
+
+      <div class="eyebrow">
+
+        ${field?.name || item.field}
+
+        ·
+
+        ${statusLabel(item.status)}
+
+      </div>
+
+
+      <h2>
+        ${item.title}
+      </h2>
+
+
+      <p class="detail-lead">
+        ${item.summary}
+      </p>
+
+
+      <div class="detail-columns">
+
+        <div>
+
+          <h3>
+            Einordnung
+          </h3>
+
+          <p>
+            ${item.detail}
+          </p>
+
+
+          <h3>
+            Typ
+          </h3>
+
+          <p>
+            ${item.type}<br>
+            ${item.date}
+          </p>
+
+        </div>
+
+
+        <div>
+
+          <h3>
+            Prüffragen
+          </h3>
+
+          <ul>
+
+            <li>
+              Was ist direkt belegt?
+            </li>
+
+            <li>
+              Welche Quelle steht am Anfang der Behauptung?
+            </li>
+
+            <li>
+              Welche unabhängigen Befunde existieren?
+            </li>
+
+            <li>
+              Welche Gegenargumente oder Alternativerklärungen gibt es?
+            </li>
+
+            <li>
+              Was wäre ein belastbarer Test?
+            </li>
+
+          </ul>
+
+        </div>
+
+      </div>
+
+
+      <div class="detail-source">
+
+        AUSGANGSPUNKT:
+
+        ${item.source}
+
+        ·
+
+        <a
+          href="${item.url}"
+          target="_blank"
+          rel="noopener">
+
+          Quelle / Recherche ↗
+
+        </a>
+
+      </div>
+
+    </div>
+
+  `;
+
+
+  dialog.showModal();
+
+}
+
+
+function filterField(id){
+
+  const fieldFilter =
+    document.querySelector("#fieldFilter");
+
+  const searchInput =
+    document.querySelector("#searchInput");
+
+  if(fieldFilter){
+    fieldFilter.value = id;
+  }
+
+  if(searchInput){
+    searchInput.value = "";
+  }
+
+  renderResults();
+
+  document
+    .querySelector("#erkunden")
+    ?.scrollIntoView({
+      behavior:"smooth"
+    });
+
+}
+
+
+/* EVENTS */
+
+document.addEventListener("DOMContentLoaded", () => {
+
+  const searchInput =
+    document.querySelector("#searchInput");
+
+  const fieldFilter =
+    document.querySelector("#fieldFilter");
+
+  const clearSearch =
+    document.querySelector("#clearSearch");
+
+  const dialog =
+    document.querySelector("#detailDialog");
+
+  const closeDialog =
+    document.querySelector("#closeDialog");
+
+  const menuBtn =
+    document.querySelector("#menuBtn");
+
+
+  if(searchInput){
+    searchInput.addEventListener(
+      "input",
+      renderResults
+    );
+  }
+
+
+  if(fieldFilter){
+    fieldFilter.addEventListener(
+      "change",
+      renderResults
+    );
+  }
+
+
+  if(clearSearch){
+
+    clearSearch.addEventListener(
+      "click",
+      () => {
+
+        searchInput.value = "";
+
+        renderResults();
+
+        searchInput.focus();
+
+      }
+    );
+
+  }
+
+
+  document
+    .querySelectorAll(".filter")
+    .forEach(button => {
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          document
+            .querySelectorAll(".filter")
+            .forEach(item =>
+              item.classList.remove("active")
+            );
+
+          button.classList.add("active");
+
+          renderResults();
+
+        }
+      );
+
+    });
+
+
+  if(closeDialog){
+
+    closeDialog.addEventListener(
+      "click",
+      () => dialog.close()
+    );
+
+  }
+
+
+  if(dialog){
+
+    dialog.addEventListener(
+      "click",
+      event => {
+
+        if(event.target === dialog){
+          dialog.close();
+        }
+
+      }
+    );
+
+  }
+
+
+  if(menuBtn){
+
+    menuBtn.addEventListener(
+      "click",
+      () => {
+
+        document
+          .querySelector(".main-nav")
+          .classList.toggle("open");
+
+      }
+    );
+
+  }
+
+
+  renderFields();
+  renderDossiers();
+  renderTimeline();
+  renderSources();
+  renderResults();
+
+});
+Danach
+Ganz unten auf Commit changes drücken.
+Dann sind alle drei Hauptdateien drin:
+✅ index.html
+✅ style.css
+✅ script.js
+Danach warten wir kurz, laden deine GitHub-Pages-Seite neu und testen erstmal, ob alles sauber läuft, bevor wir noch mehr Daten hineinpacken.
